@@ -1,15 +1,21 @@
 package com.myself.springboot.web.springbootfirstwebapplication.controller;
 
 
+import java.awt.Component.BaselineResizeBehavior;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
 import javax.validation.Valid;
+import javax.xml.bind.Binder;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,16 +32,29 @@ public class TodoController {
 	@Autowired
 	private TodoService service;
 
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		//Date- dd/MM/yyyy
+		SimpleDateFormat dateFormat=new SimpleDateFormat("dd/MM/yyyy");
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, false));
+	}
+	
+	
 	@RequestMapping(value = "/list-todos", method = RequestMethod.GET)
 	public String showLoginPage(ModelMap model, String name) {
-		String user = (String) model.get("name");
+		String user = getLoggedInUserName(model);
 		model.addAttribute("todos", service.retrieveTodos(user));
 		return "list-todos";
+	}
+
+
+	private String getLoggedInUserName(ModelMap model) {
+		return (String) model.get("name");
 	}
 	
 	@RequestMapping(value = "/add-todo", method = RequestMethod.GET)
 	public String showAddTodoPage(ModelMap model) {
-		model.addAttribute("todo", new Todo(0,(String) model.get("name"), "" , new Date(), false));
+		model.addAttribute("todo", new Todo(0,getLoggedInUserName(model), "" , new Date(), false));
 		return "todo";
 	}
 	
@@ -59,7 +78,7 @@ public class TodoController {
 			return "todo";
 		}
 		
-		todo.setUser((String) model.get("name"));
+		todo.setUser(getLoggedInUserName(model));
 		
 		 service.updateTodo(todo);
 		
@@ -71,7 +90,7 @@ public class TodoController {
 		if(result.hasErrors()) {
 			return "todo";
 		}
-		service.addTodo((String) model.get("name"), todo.getDesc(), new Date(), false);
+		service.addTodo(getLoggedInUserName(model), todo.getDesc(), todo.getTargetDate(), false);
 		model.clear();// to prevent request parameter "name" to be passed
 		return "redirect:/list-todos";
 	}

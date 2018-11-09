@@ -24,18 +24,12 @@ public class LoginController {
 		return "login";
 	}
 
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public String handleUserLogin(ModelMap model, @RequestParam String name,
-			@RequestParam String password) {
-
-		if (!loginService.validateUser(name, password)) {
-			model.put("errorMessage", "Invalid Credentials");
-			return "login";
-		}
-
-		model.put("name", name);
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String showLoginPage(ModelMap model) {
+		model.put("name", "zarrar");
 		return "welcome";
 	}
+
 }
 
 

@@ -1,10 +1,7 @@
-<html>
-<head>
-
-<title>Simple Web Application</title>
-</head>
-<body>
-Welcome....You have made it...${name}, <a href ="/list-todos"> Click Here</a> to manage your Todos. 
-</body>
-
-</html>
+<%@ include file="common/header.jspf"%>
+<%@ include file="common/navigation.jspf"%>
+<div class="container">
+	Welcome ${name}!! <a href="/list-todos">Click here</a> to manage your
+	todo's.
+</div>
+<%@ include file="common/footer.jspf"%>
