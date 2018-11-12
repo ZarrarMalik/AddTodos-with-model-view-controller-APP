@@ -11,6 +11,8 @@ import javax.xml.bind.Binder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -26,7 +28,7 @@ import com.myself.springboot.web.springbootfirstwebapplication.service.TodoServi
 
 
 @Controller
-@SessionAttributes("name")
+///@SessionAttributes("name")
 public class TodoController {
 
 	@Autowired
@@ -49,8 +51,15 @@ public class TodoController {
 
 
 	private String getLoggedInUserName(ModelMap model) {
-		return (String) model.get("name");
+		Object principal = SecurityContextHolder.getContext()
+				.getAuthentication().getPrincipal();
+
+		if (principal instanceof UserDetails)
+			return ((UserDetails) principal).getUsername();
+
+		return principal.toString();
 	}
+	
 	
 	@RequestMapping(value = "/add-todo", method = RequestMethod.GET)
 	public String showAddTodoPage(ModelMap model) {
